@@ -14,7 +14,7 @@ namespace GMABot.Http
 
         // Timer constants
         const int checkTime =       1 * 60 * 1000;
-        const int resetTime = 24 * 60 * 60 * 1000;
+        const int resetTime = 2 * 60 * 1000;
 
         // TODO: Check with higher amount of reset timer, if i'm correct, this should have a bug
         // The bug would be that it would skip the "activated" dailies because the reset will be
@@ -64,7 +64,7 @@ namespace GMABot.Http
             if (timer == null) return;
 
             TimeOnly currentTime = TimeOnly.FromDateTime(DateTime.Now);
-            if (timer.Time.CompareTo(currentTime) > 0) return;
+            if (!currentTime.IsBetween(timer.Time, timer.Time.AddMinutes(2))) return;
 
             Console.WriteLine($"[{DateTime.Now}] Sent message: {message}");
 
@@ -87,6 +87,8 @@ namespace GMABot.Http
             resetTimer.Elapsed += new ElapsedEventHandler((e, v) => ResetTimers());
         }
 
+        // Maybe use code given below for resetTimer (based on how we want to define the timer interval)
+        // messageTimers.FindAll(timer => timer.Time.CompareTo(currentTime) > 0).ForEach(timer => timer.Start())
         void ResetTimers() => messageTimers.ForEach(m => m.Start());
     }
 
