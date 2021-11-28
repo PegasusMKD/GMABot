@@ -1,15 +1,31 @@
-{
+﻿{
   "channel": "913996232790274070",
   "messages": [
     {
-      "time": "07:03:10",
-      "message": "Gm...?"
+      "time": "05:05:30",
+      "message": "GUTEN MORGEN FUCKERS",
+      "type": "MESSAGE"
     }
   ],
   "htmlMessages": [
     {
-      "time": "03:04:10",
+      "title": "Хороскоп - Шкорпија",
+      "time": "05:05:10",
+      "type": "EMBED",
+      "url": "http://www.astromagazin.com.mk/skorpija/dneven.php"
+    },
+    {
+      "title": "Хороскоп - Вага",
+      "time": "05:05:10",
+      "type": "EMBED",
+      "url": "http://www.astromagazin.com.mk/vaga/dneven.php"
+    },
+    {
+      "title": "Хороскоп - Овен",
+      "time": "05:05:10",
+      "type": "EMBED",
       "url": "http://www.astromagazin.com.mk/oven/dneven.php"
     }
+
   ]
 }

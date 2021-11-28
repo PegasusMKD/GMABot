@@ -1,4 +1,5 @@
 ﻿using GMABot.Converters;
+using GMABot.Models.Discord;
 using Newtonsoft.Json;
 
 namespace GMABot.Models.Schedules
@@ -7,9 +8,14 @@ namespace GMABot.Models.Schedules
     {
         [JsonConverter(typeof(TimeOnlyConverter))]
         public TimeOnly time;
-        public DateTime dateTime;
+        public DateTime? dateTime;
 
-        // TODO: Add global.channel as default
-        public string channel;
+        public string? channel;
+
+        public string? title;
+        public FormatType type = FormatType.MESSAGE;
+
+        [JsonConverter(typeof(EmbedJsonConverter))]
+        public EmbedType embedType = EmbedType.RICH;
     }
 }

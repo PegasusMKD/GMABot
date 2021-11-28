@@ -44,12 +44,18 @@ namespace GMABot.Http
 
         public void Start()
         {
-            ScheduleMessages<MessageSchedule>(messages, (schedule, timer) => 
-                DiscordHttpClient.SendMessage(timer, schedule.message, schedule.channel ?? defaultChannel)
+            ScheduleMessages<MessageSchedule>(messages, (schedule, timer) =>
+                {
+                    var message = DiscordMessageFactory.CreateMessage(schedule, schedule.message);
+                    DiscordHttpClient.SendMessage(timer, message, schedule.channel ?? defaultChannel);
+                }
             );
 
             ScheduleMessages<HTMLSchedule>(htmlSchedules, (schedule, timer) =>
-                DiscordHttpClient.SendMessage(timer, HTMLParser.ParseHtmlText(schedule.url), schedule.channel ?? defaultChannel)
+                {
+                    var message = DiscordMessageFactory.CreateMessage(schedule, HTMLParser.ParseHtmlText(schedule.url));
+                    DiscordHttpClient.SendMessage(timer, message, schedule.channel ?? defaultChannel);
+                }
             );
 
             // Queue remaining messages of the day
@@ -68,7 +74,7 @@ namespace GMABot.Http
             {
                 MessageTimer timer = new(checkTime, schedule.time);
                 timer.Elapsed += new ElapsedEventHandler((e, v) =>
-                    action(schedule, e as MessageTimer)
+                    action(schedule, (e as MessageTimer)!)
                 );
                 scheduleTimers.Add(timer);
             }

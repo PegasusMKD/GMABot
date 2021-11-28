@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace GMABot.HTTP
 {
-    internal class DiscordHttpClient
+    static internal class DiscordHttpClient
     {
         static readonly HttpClient client = HttpClientFactory.GetHttpClient();
 
-        public static void SendMessage(MessageTimer? timer, string message, string channel)
+        public static void SendMessage(MessageTimer? timer, DiscordMessage message, string channel)
         {
             if (timer == null) return;
 
@@ -26,12 +26,7 @@ namespace GMABot.HTTP
             var request = new HttpRequestMessage(HttpMethod.Post,
                 HttpClientFactory.baseUri + $"/channels/{channel}/messages");
 
-            var messagePayload = new DiscordMessage()
-            {
-                content = message
-            };
-
-            request.Content = new StringContent(JsonConvert.SerializeObject(messagePayload), Encoding.Unicode, "application/json");
+            request.Content = new StringContent(JsonConvert.SerializeObject(message), Encoding.Unicode, "application/json");
 
             client.Send(request);
             timer.Stop();
