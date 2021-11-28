@@ -1,15 +1,13 @@
 ﻿using GMABot.Converters;
 using Newtonsoft.Json;
 
-namespace GMABot.Models
+namespace GMABot.Models.Schedules
 {
-    // Wrapper for scheduling the message tasks
-    struct MessageSchedule
+    internal class Schedule
     {
         [JsonConverter(typeof(TimeOnlyConverter))]
         public TimeOnly time;
         public DateTime dateTime;
-        public string message;
 
         // TODO: Add global.channel as default
         public string channel;

@@ -1,5 +1,7 @@
 ﻿using GMABot.Factories;
+using GMABot.HTTP;
 using GMABot.Models;
+using GMABot.Models.Schedules;
 using GMABot.Timers;
 using Newtonsoft.Json;
 using System.Text;
@@ -8,13 +10,13 @@ using System.Timers;
 
 namespace GMABot.Http
 {
-    class MessageClient
+    class MessageScheduler
     {
         readonly HttpClient client = HttpClientFactory.GetHttpClient();
 
         // Timer constants
-        const int checkTime =       1 * 60 * 1000;
-        const int resetTime = 2 * 60 * 1000;
+        const int checkTime =      1 * 60 * 1000;
+        const int resetTime = 24 * 60 * 60 * 1000;
 
         // TODO: Check with higher amount of reset timer, if i'm correct, this should have a bug
         // The bug would be that it would skip the "activated" dailies because the reset will be
@@ -24,14 +26,16 @@ namespace GMABot.Http
         // Discord
         readonly string defaultChannel;
         readonly MessageSchedule[] messages;
+        readonly HTMLSchedule[] htmlSchedules;
 
         // Timers
         private System.Timers.Timer resetTimer;
-        private readonly List<MessageTimer> messageTimers = new();
+        private readonly List<MessageTimer> scheduleTimers = new();
 
-        public MessageClient(Configuration configuration)
+        public MessageScheduler(Configuration configuration)
         {
             this.messages = configuration.messages;
+            this.htmlSchedules = configuration.htmlMessages;
             this.defaultChannel = configuration.channel;
 
             // Create reset timer
@@ -40,18 +44,17 @@ namespace GMABot.Http
 
         public void Start()
         {
-            foreach (MessageSchedule schedule in messages)
-            {
-                MessageTimer timer = new(checkTime, schedule.time);
-                timer.Elapsed += new ElapsedEventHandler((e, v) =>
-                    SendMessage(e as MessageTimer, schedule.message, schedule.channel)
-                );
-                messageTimers.Add(timer);
-            }
+            ScheduleMessages<MessageSchedule>(messages, (schedule, timer) => 
+                DiscordHttpClient.SendMessage(timer, schedule.message, schedule.channel ?? defaultChannel)
+            );
+
+            ScheduleMessages<HTMLSchedule>(htmlSchedules, (schedule, timer) =>
+                DiscordHttpClient.SendMessage(timer, HTMLParser.ParseHtmlText(schedule.url), schedule.channel ?? defaultChannel)
+            );
 
             // Queue remaining messages of the day
             TimeOnly currentTime = TimeOnly.FromDateTime(DateTime.Now);
-            messageTimers.FindAll(timer => timer.Time.CompareTo(currentTime) > 0).ForEach(timer => timer.Start());
+            scheduleTimers.FindAll(timer => timer.Time.CompareTo(currentTime) > 0).ForEach(timer => timer.Start());
 
             resetTimer.Start();
 
@@ -59,26 +62,16 @@ namespace GMABot.Http
             while (Console.ReadLine() != "q") ;
         }
 
-        void SendMessage(MessageTimer? timer, string message, string channel)
+        void ScheduleMessages<T>(T[] messages, Action<T, MessageTimer> action) where T: Schedule
         {
-            if (timer == null) return;
-
-            TimeOnly currentTime = TimeOnly.FromDateTime(DateTime.Now);
-            if (!currentTime.IsBetween(timer.Time, timer.Time.AddMinutes(2))) return;
-
-            Console.WriteLine($"[{DateTime.Now}] Sent message: {message}");
-
-            var request = new HttpRequestMessage(HttpMethod.Post, HttpClientFactory.baseUri + $"/channels/{channel ?? defaultChannel}/messages");
-
-            var messagePayload = new Message()
+            foreach (T schedule in messages)
             {
-                content = message
-            };
-
-            request.Content = new StringContent(JsonConvert.SerializeObject(messagePayload), Encoding.Unicode, "application/json");
-
-            client.Send(request);
-            timer.Stop();
+                MessageTimer timer = new(checkTime, schedule.time);
+                timer.Elapsed += new ElapsedEventHandler((e, v) =>
+                    action(schedule, e as MessageTimer)
+                );
+                scheduleTimers.Add(timer);
+            }
         }
 
         void CreateResetTimer()
@@ -89,7 +82,7 @@ namespace GMABot.Http
 
         // Maybe use code given below for resetTimer (based on how we want to define the timer interval)
         // messageTimers.FindAll(timer => timer.Time.CompareTo(currentTime) > 0).ForEach(timer => timer.Start())
-        void ResetTimers() => messageTimers.ForEach(m => m.Start());
+        void ResetTimers() => scheduleTimers.ForEach(m => m.Start());
     }
 
 }
