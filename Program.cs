@@ -10,5 +10,5 @@ using (StreamReader r = new StreamReader("config.json"))
     configJson = r.ReadToEnd();
 
 var config = JsonConvert.DeserializeObject<Configuration>(configJson);
-MessageClient client = new(config);
-client.Start();
+MessageScheduler scheduler = new(config);
+scheduler.Start();
