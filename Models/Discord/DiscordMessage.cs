@@ -7,5 +7,6 @@
         public string content = "";
         public bool tts = false;
         public bool allow_mentions = false;
+        public List<DiscordEmbed>? embeds = null;
     }
 }

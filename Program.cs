@@ -6,7 +6,7 @@ using System.Text;
 string configJson;
 Console.OutputEncoding = Encoding.Unicode;
 
-using (StreamReader r = new StreamReader("config.json"))
+using (StreamReader r = new StreamReader("./config.json"))
     configJson = r.ReadToEnd();
 
 var config = JsonConvert.DeserializeObject<Configuration>(configJson);

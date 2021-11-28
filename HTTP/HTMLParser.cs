@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GMABot.HTTP
 {
-    internal class HTMLParser
+    static internal class HTMLParser
     {
         private static readonly HttpClient httpClient = new HttpClient();
 
@@ -18,9 +18,7 @@ namespace GMABot.HTTP
             return htmlDocument.GetElementbyId("text").InnerText;
         }
 
-        static string GetHtml(string url)
-        {
-            return httpClient.GetStringAsync(url).Result;
-        }
+        static string GetHtml(string url) =>
+            httpClient.GetStringAsync(url).Result;
     }
 }
