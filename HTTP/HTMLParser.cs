@@ -11,11 +11,12 @@ namespace GMABot.HTTP
     {
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public static string ParseHtmlText(string url)
+        // TODO: Transform this into ParseHtmlText(url, params string[] tags), and then return a list of all the innerText of the tags
+        public static string GetDailyHoroscopeText(string url, string tag)
         {
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(GetHtml(url));
-            return htmlDocument.GetElementbyId("text").InnerText;
+            return htmlDocument.GetElementbyId(tag).InnerText;
         }
 
         static string GetHtml(string url) =>

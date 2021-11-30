@@ -1,5 +1,6 @@
 ﻿using GMABot.Factories;
 using GMABot.Models;
+using GMABot.Models.WebSocket.Event_Responses;
 using GMABot.Slash_Commands;
 using GMABot.Timers;
 using Newtonsoft.Json;
@@ -24,13 +25,24 @@ namespace GMABot.HTTP
             NullValueHandling = NullValueHandling.Ignore
         };
 
+        public static void ReplyToInteraction(string interactionToken, string interactionId, DiscordMessage reply)
+        {
+            Console.WriteLine($"[{DateTime.Now}] Replied to interaction: {interactionId}");
+            var request = new HttpRequestMessage(HttpMethod.Post,
+                HttpClientFactory.baseUri + $"/v8/interactions/{interactionId}/{interactionToken}/callback");
+
+            request.Content = new StringContent(JsonConvert.SerializeObject(new InteractionEventResponse { data = reply }), Encoding.Unicode, "application/json");
+
+            client.SendAsync(request);
+        }
+
         public static void CreateCommand(DiscordSubcommand subcommand)
         {
             var request = new HttpRequestMessage(HttpMethod.Post,
                 HttpClientFactory.baseUri + $"/applications/{applicationId}/commands");
             request.Content = new StringContent(JsonConvert.SerializeObject(subcommand, serializerSettings), Encoding.Unicode, "application/json");
 
-            client.SendAsync(request);
+            var result = client.SendAsync(request);
         }
 
         public static void SendTimerMessage(MessageTimer? timer, DiscordMessage message, string channel)

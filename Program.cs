@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using System.Text;
 
 //string configJson;
-//Console.OutputEncoding = Encoding.Unicode;
+Console.OutputEncoding = Encoding.Unicode;
 
 //using (StreamReader r = new StreamReader("./config.json"))
 //    configJson = r.ReadToEnd();
@@ -15,3 +15,4 @@ using System.Text;
 //scheduler.Start();
 
 DiscordCommandCreator.CreateCommands();
+await DiscordWebSocket.Start();

@@ -8,8 +8,8 @@ namespace GMABot.Slash_Commands.Core
 {
     public interface ISubcommand
     {
-        DiscordParameter[]? parameters { get; }
+        DiscordCommandParameter[]? parameters { get; }
 
-        void Execute(string channel, params object[] parameters);
+        void Execute(string token, string id, object[] parameters);
     }
 }

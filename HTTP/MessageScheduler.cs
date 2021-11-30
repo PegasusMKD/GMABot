@@ -53,7 +53,7 @@ namespace GMABot.Http
 
             ScheduleMessages<HTMLSchedule>(htmlSchedules, (schedule, timer) =>
                 {
-                    var message = DiscordMessageFactory.CreateMessage(schedule, HTMLParser.ParseHtmlText(schedule.url));
+                    var message = DiscordMessageFactory.CreateMessage(schedule, HTMLParser.GetDailyHoroscopeText(schedule.url, "text"));
                     DiscordHttpClient.SendTimerMessage(timer, message, schedule.channel ?? defaultChannel);
                 }
             );
@@ -63,9 +63,6 @@ namespace GMABot.Http
             scheduleTimers.FindAll(timer => timer.Time.CompareTo(currentTime) > 0).ForEach(timer => timer.Start());
 
             resetTimer.Start();
-
-            // So we stall the main thread while the timers are ticking
-            while (Console.ReadLine() != "q") ;
         }
 
         void ScheduleMessages<T>(T[] messages, Action<T, MessageTimer> action) where T: Schedule

@@ -1,17 +1,21 @@
-﻿namespace GMABot.Slash_Commands
+﻿using Newtonsoft.Json;
+
+namespace GMABot.Slash_Commands
 {
-    internal class DiscordSubcommand : DiscordParameter
+    internal class DiscordSubcommand : DiscordCommandParameter
     {
+        [JsonProperty(Order = 5)]
         public string? group { get; set; }
-        
-        public List<DiscordSubcommand>? options { get; set; }
+
+        [JsonProperty(Order = 6)]
+        public DiscordSubcommand[]? options { get; set; }
 
         public DiscordSubcommand()
         {
             type = 1;
         }
 
-        public DiscordSubcommand(DiscordParameter parameter)
+        public DiscordSubcommand(DiscordCommandParameter parameter)
         {
             this.type = parameter.type;
             this.name = parameter.name;
