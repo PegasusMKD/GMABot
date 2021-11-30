@@ -2,13 +2,6 @@
 using GMABot.Models.WebSocket.Events;
 using GMABot.Slash_Commands.Core;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace GMABot.WebSocket
 {
@@ -18,6 +11,8 @@ namespace GMABot.WebSocket
 
         public static void Dispatch(DiscordEventBase eventBase)
         {
+            if (eventBase.op == 11) eventBase.t = DiscordEventType.HEARTBEAT;
+            if (eventBase == null) return;
             Console.WriteLine($"[{DateTime.Now}] Received event: {eventBase.t}");
             switch(eventBase.t)
             {
@@ -26,9 +21,11 @@ namespace GMABot.WebSocket
                     commands[discordEvent.command.name].Execute(discordEvent.meta.token, discordEvent.meta.id,
                         discordEvent.command.options!.Select(option => option.value).ToArray());
                     break;
+
                 // Disconnected, should close all sockets, reconnect and resume
-                case null:
-                    Console.WriteLine(eventBase.json);
+                case DiscordEventType.READY:
+                    var readyEvent = JsonConvert.DeserializeObject<DiscordEventWrapper<ReadyEvent>>(eventBase.json!);
+                    DiscordWebSocket.sessionId = readyEvent!.d!.session_id;
                     break;
             }
         }
@@ -36,14 +33,14 @@ namespace GMABot.WebSocket
         public static (T meta, DiscordEventParameter command) GetCommand<T>(DiscordEventBase eventBase, Func<T, DiscordEventParameter> startingParameters)
         {
             var discordEvent = JsonConvert.DeserializeObject<DiscordEventWrapper<T>>(eventBase.json!);
-            DiscordEventParameter command = startingParameters.Invoke(discordEvent!.d);
+            DiscordEventParameter command = startingParameters.Invoke(discordEvent!.d!);
             DiscordEventParameter? previous = null;
             while (command.options != null)
             {
                 previous = command;
                 command = command.options[0];
             }
-            return (discordEvent.d, previous ?? command);
+            return (discordEvent.d, previous ?? command)!;
         }
     }
 }

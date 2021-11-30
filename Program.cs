@@ -15,4 +15,4 @@ Console.OutputEncoding = Encoding.Unicode;
 //scheduler.Start();
 
 DiscordCommandCreator.CreateCommands();
-await DiscordWebSocket.Start();
+ await DiscordWebSocket.Start();
