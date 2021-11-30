@@ -47,14 +47,14 @@ namespace GMABot.Http
             ScheduleMessages<MessageSchedule>(messages, (schedule, timer) =>
                 {
                     var message = DiscordMessageFactory.CreateMessage(schedule, schedule.message);
-                    DiscordHttpClient.SendMessage(timer, message, schedule.channel ?? defaultChannel);
+                    DiscordHttpClient.SendTimerMessage(timer, message, schedule.channel ?? defaultChannel);
                 }
             );
 
             ScheduleMessages<HTMLSchedule>(htmlSchedules, (schedule, timer) =>
                 {
                     var message = DiscordMessageFactory.CreateMessage(schedule, HTMLParser.ParseHtmlText(schedule.url));
-                    DiscordHttpClient.SendMessage(timer, message, schedule.channel ?? defaultChannel);
+                    DiscordHttpClient.SendTimerMessage(timer, message, schedule.channel ?? defaultChannel);
                 }
             );
 

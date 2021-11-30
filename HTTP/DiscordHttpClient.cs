@@ -1,5 +1,6 @@
 ﻿using GMABot.Factories;
 using GMABot.Models;
+using GMABot.Slash_Commands;
 using GMABot.Timers;
 using Newtonsoft.Json;
 using System;
@@ -14,13 +15,38 @@ namespace GMABot.HTTP
     {
         static readonly HttpClient client = HttpClientFactory.GetHttpClient();
 
-        public static void SendMessage(MessageTimer? timer, DiscordMessage message, string channel)
+        // Most probably not needed here!
+        private const string applicationId = "913933589392023584";
+        // 
+
+        private static readonly JsonSerializerSettings serializerSettings = new()
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
+
+        public static void CreateCommand(DiscordSubcommand subcommand)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post,
+                HttpClientFactory.baseUri + $"/applications/{applicationId}/commands");
+            request.Content = new StringContent(JsonConvert.SerializeObject(subcommand, serializerSettings), Encoding.Unicode, "application/json");
+
+            client.SendAsync(request);
+        }
+
+        public static void SendTimerMessage(MessageTimer? timer, DiscordMessage message, string channel)
         {
             if (timer == null) return;
 
             TimeOnly currentTime = TimeOnly.FromDateTime(DateTime.Now);
             if (!currentTime.IsBetween(timer.Time, timer.Time.AddMinutes(2))) return;
 
+            SendMessage(message, channel);
+
+            timer.Stop();
+        }
+
+        public static void SendMessage(DiscordMessage message, string channel)
+        {
             Console.WriteLine($"[{DateTime.Now}] Sent message: {message}");
 
             var request = new HttpRequestMessage(HttpMethod.Post,
@@ -28,8 +54,8 @@ namespace GMABot.HTTP
 
             request.Content = new StringContent(JsonConvert.SerializeObject(message), Encoding.Unicode, "application/json");
 
-            client.Send(request);
-            timer.Stop();
+            client.SendAsync(request);
+
         }
     }
 }
