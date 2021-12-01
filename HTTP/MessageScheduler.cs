@@ -12,7 +12,7 @@ namespace GMABot.Http
 {
     class MessageScheduler
     {
-        readonly HttpClient client = HttpClientFactory.GetHttpClient();
+        readonly HttpClient client = HttpClientFactory.GetDiscordHttpClient();
 
         // Timer constants
         const int checkTime =      1 * 60 * 1000;
@@ -44,6 +44,7 @@ namespace GMABot.Http
 
         public void Start()
         {
+            Console.WriteLine($"[{DateTime.Now}] Scheduled standard messages.");
             ScheduleMessages<MessageSchedule>(messages, (schedule, timer) =>
                 {
                     var message = DiscordMessageFactory.CreateMessage(schedule, schedule.message);
@@ -51,6 +52,7 @@ namespace GMABot.Http
                 }
             );
 
+            Console.WriteLine($"[{DateTime.Now}] Scheduled HTML messages.");
             ScheduleMessages<HTMLSchedule>(htmlSchedules, (schedule, timer) =>
                 {
                     var message = DiscordMessageFactory.CreateMessage(schedule, HTMLParser.GetDailyHoroscopeText(schedule.url, "text"));
@@ -60,8 +62,14 @@ namespace GMABot.Http
 
             // Queue remaining messages of the day
             TimeOnly currentTime = TimeOnly.FromDateTime(DateTime.Now);
-            scheduleTimers.FindAll(timer => timer.Time.CompareTo(currentTime) > 0).ForEach(timer => timer.Start());
+            
 
+            Console.WriteLine($"[{DateTime.Now}] Started timers.");
+            // scheduleTimers.FindAll(timer => timer.Time.CompareTo(currentTime) > 0)
+            scheduleTimers.ForEach(timer => timer.Start());
+
+
+            Console.WriteLine($"[{DateTime.Now}] Started reset timer.");
             resetTimer.Start();
         }
 

@@ -4,15 +4,18 @@ using GMABot.Slash_Commands.Creator;
 using Newtonsoft.Json;
 using System.Text;
 
-//string configJson;
+string configJson;
 Console.OutputEncoding = Encoding.Unicode;
 
-//using (StreamReader r = new StreamReader("./config.json"))
-//    configJson = r.ReadToEnd();
+using (StreamReader r = new StreamReader("./config.json"))
+    configJson = r.ReadToEnd();
 
-//var config = JsonConvert.DeserializeObject<Configuration>(configJson);
-//MessageScheduler scheduler = new(config);
-//scheduler.Start();
-
+Console.WriteLine($"[{DateTime.Now}] Read config.json.");
 DiscordCommandCreator.CreateCommands();
- await DiscordWebSocket.Start();
+
+
+var config = JsonConvert.DeserializeObject<Configuration>(configJson);
+MessageScheduler scheduler = new(config);
+scheduler.Start();
+
+await DiscordWebSocket.Start();

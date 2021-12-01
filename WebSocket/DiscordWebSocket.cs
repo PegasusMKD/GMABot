@@ -18,7 +18,7 @@ static class DiscordWebSocket
     };
 
     private static readonly Random random = new();
-    private static readonly System.Timers.Timer heartbeatTimer = new();
+    private static System.Timers.Timer heartbeatTimer;
 
     // TODO: Clean up into a ".settings" file
     static readonly string token = "OTEzOTMzNTg5MzkyMDIzNTg0.YaFs-w.87wQwPP2ISCHroQqU-93kXvFCBI";
@@ -69,6 +69,8 @@ static class DiscordWebSocket
         // Receive opCode 10 (client is connected)
         var result = await GetDiscordEvent(clientWebSocket, cancellationToken);
         var interval = JToken.Parse(result!.json!)!["d"]!.Value<int>("heartbeat_interval");
+        
+        heartbeatTimer = new System.Timers.Timer(interval);
         heartbeatTimer.Interval = interval;
         heartbeatTimer.Elapsed += new ElapsedEventHandler(async (e, v) =>
         {
@@ -124,7 +126,6 @@ static class DiscordWebSocket
                 {
                     Thread.Sleep(random.Next(1000, 5000));
                     await Identify(clientWebSocket);
-                    result = await GetDiscordEvent(clientWebSocket, cancellationToken);
                 }
 
                 latestSequenceNumber = result?.s ?? latestSequenceNumber;

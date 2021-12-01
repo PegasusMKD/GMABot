@@ -1,4 +1,5 @@
 ﻿using GMABot.Models;
+using GMABot.Models.Discord;
 using GMABot.Models.Schedules;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,12 @@ namespace GMABot.Factories
             return message;
         }
 
+        public static DiscordMessage CreateMediaMessage(string alt, (string url, bool isVideo)[] urls) =>
+            new() { embeds = urls.Select(url => CreateMediaEmbed(url.url, url.isVideo)).Concat(new List<DiscordEmbed>() {
+                new DiscordEmbed { description = $"In case of failure: https://www.reddit.com{alt}" }
+            }).ToList() };
 
+        public static DiscordEmbed CreateMediaEmbed(string url, bool isVideo) =>
+            new() { type = EmbedType.IMAGE, image = new DiscordImage { url = url } };
     }
 }
