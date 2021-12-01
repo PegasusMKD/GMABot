@@ -2,9 +2,9 @@
 {
     class DiscordEventWrapper<T> : DiscordEventBase
     {
-        public T d;
+        public T? d;
 
-        public DiscordEventWrapper(int opCode, T data)
+        public DiscordEventWrapper(int opCode, T? data)
         {
             op = opCode;
             d = data;

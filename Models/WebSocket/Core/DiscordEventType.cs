@@ -41,6 +41,7 @@ namespace GMABot.Models.WebSocket
         MESSAGE_CREATE,
         MESSAGE_UPDATE,
         MESSAGE_DELETE,
-        MESSAGE_DELETE_BULK
+        MESSAGE_DELETE_BULK,
+        HEARTBEAT
     }
 }
