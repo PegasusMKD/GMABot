@@ -14,7 +14,7 @@ namespace GMABot.HTTP
 {
     static internal class DiscordHttpClient
     {
-        static readonly HttpClient client = HttpClientFactory.GetHttpClient();
+        static readonly HttpClient client = HttpClientFactory.GetDiscordHttpClient();
 
         // Most probably not needed here!
         private const string applicationId = "913933589392023584";
@@ -41,8 +41,8 @@ namespace GMABot.HTTP
             var request = new HttpRequestMessage(HttpMethod.Post,
                 HttpClientFactory.baseUri + $"/applications/{applicationId}/commands");
             request.Content = new StringContent(JsonConvert.SerializeObject(subcommand, serializerSettings), Encoding.Unicode, "application/json");
-
-            var result = client.SendAsync(request);
+            
+            client.SendAsync(request);
         }
 
         public static void SendTimerMessage(MessageTimer? timer, DiscordMessage message, string channel)
@@ -54,6 +54,7 @@ namespace GMABot.HTTP
 
             SendMessage(message, channel);
 
+            Console.WriteLine($"[{DateTime.Now}] Sent message.");
             timer.Stop();
         }
 
