@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace GMABot.Slash_Commands.Commands.Latex
 {
+    // https://www.reddit.com/dev/api
+    // https://www.reddit.com/prefs/apps
     static class RedditClient
     {
 

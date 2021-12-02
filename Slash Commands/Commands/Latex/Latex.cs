@@ -18,11 +18,11 @@ namespace GMABot.Slash_Commands.Commands.Latex
         // Get Binary image of post
         // Send image as Discord Message
         // Path: https://www.reddit.com/r/ShinyPorn/{category}?count=0
-        public void Execute(string token, string id, object[] parameters)
+        public void Execute(string token, string id, object[]? parameters)
         {
             Task.Factory.StartNew(async () =>
             {
-                string category = parameters[0] as string ?? "new";
+                string category = parameters?[0] as string ?? "new";
                 RedditPost post = await RedditClient.GetRandomPost("r/ShinyPorn", category, true);
                 Console.WriteLine($"[{DateTime.Now}] Post PermaUrl: {post.permaLink}");
                 Console.WriteLine($"[{DateTime.Now}] Image Url: {post.imageUrl}");
