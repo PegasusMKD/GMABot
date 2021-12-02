@@ -11,15 +11,15 @@ namespace GMABot.WebSocket
 
         public static void Dispatch(DiscordEventBase eventBase)
         {
-            if (eventBase.op == 11) eventBase.t = DiscordEventType.HEARTBEAT;
             if (eventBase == null) return;
+            if (eventBase.op == 11) eventBase.t = DiscordEventType.HEARTBEAT;
             Console.WriteLine($"[{DateTime.Now}] Received event: {eventBase.t}");
             switch(eventBase.t)
             {
                 case DiscordEventType.INTERACTION_CREATE:
                     var discordEvent = GetCommand<InteractionEvent>(eventBase, (discordEvent) => discordEvent.data);
                     commands[discordEvent.command.name].Execute(discordEvent.meta.token, discordEvent.meta.id,
-                        discordEvent.command.options!.Select(option => option.value).ToArray());
+                        discordEvent.command.options?.Select(option => option.value).ToArray());
                     break;
 
                 // Disconnected, should close all sockets, reconnect and resume
@@ -40,7 +40,8 @@ namespace GMABot.WebSocket
                 previous = command;
                 command = command.options[0];
             }
-            return (discordEvent.d, previous ?? command)!;
+
+            return (discordEvent.d, command.type == 1 ? command : previous)!;
         }
     }
 }

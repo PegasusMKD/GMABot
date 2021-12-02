@@ -9,7 +9,7 @@ namespace GMABot.Slash_Commands.Commands
                 new DiscordCommandParameter { name = "search-text", description = "The text you'd wish to be searched (for example, the name of the game).", required = true }
             };
 
-        public void Execute(string token, string id, object[] parameters)
+        public void Execute(string token, string id, object[]? parameters)
         {
             throw new NotImplementedException();
         }

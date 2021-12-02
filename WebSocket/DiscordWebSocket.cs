@@ -22,6 +22,7 @@ static class DiscordWebSocket
 
     // TODO: Clean up into a ".settings" file
     static readonly string token = "OTEzOTMzNTg5MzkyMDIzNTg0.YaFs-w.87wQwPP2ISCHroQqU-93kXvFCBI";
+    // https://ziad87.net/intents/
     static readonly int intent = 513;
 
     public static string sessionId;
@@ -29,29 +30,36 @@ static class DiscordWebSocket
 
     static async Task<DiscordEventBase?> GetDiscordEvent(ClientWebSocket clientWebSocket, CancellationToken cancellationToken)
     {
-        var buffer = new byte[1024];
-        using(MemoryStream data = new(65536))
+        try
         {
-            while (true)
+            var buffer = new byte[1024];
+            using(MemoryStream data = new(65536))
             {
-                var received = await clientWebSocket.ReceiveAsync(buffer, cancellationToken);
-                if (received.MessageType != WebSocketMessageType.Close)
-                    data.Write(buffer, 0, received.Count);
+                while (true)
+                {
+                    if(clientWebSocket.State != WebSocketState.Open) return null;
+                    var received = await clientWebSocket.ReceiveAsync(buffer, cancellationToken);
+                    if (received.MessageType != WebSocketMessageType.Close)
+                        data.Write(buffer, 0, received.Count);
 
-                if (received.MessageType == WebSocketMessageType.Close || received.EndOfMessage)
-                    break;
-            }
-            if (data == null)
-                return null;
+                    if (received.MessageType == WebSocketMessageType.Close || received.EndOfMessage)
+                        break;
+                }
+                if (data == null)
+                    return null;
 
-            data.Position = 0;
-            var jsonString = Encoding.UTF8.GetString(data.ToArray());
+                data.Position = 0;
+                var jsonString = Encoding.UTF8.GetString(data.ToArray());
             
-            // TODO: Add "interaction"/event specific deserialize
-            var json = JsonConvert.DeserializeObject<DiscordEventBase>(jsonString);
-            if(json == null) return null;
-            json.json = jsonString;
-            return json;
+                // TODO: Add "interaction"/event specific deserialize
+                var json = JsonConvert.DeserializeObject<DiscordEventBase>(jsonString);
+                if(json == null) return null;
+                json.json = jsonString;
+                return json;
+            }
+        } catch (WebSocketException)
+        {
+            return null;
         }
     }
 
@@ -74,11 +82,12 @@ static class DiscordWebSocket
         heartbeatTimer.Interval = interval;
         heartbeatTimer.Elapsed += new ElapsedEventHandler(async (e, v) =>
         {
+            if(clientWebSocket.State != WebSocketState.Open) return;
             var payload = new DiscordEventWrapper<int>(1, 2);
             await SendDiscordEvent<int>(clientWebSocket, payload);
         });
         heartbeatTimer.Start();
-        
+
         // Identify/login as the bot, and subscribe to specific events through the "intents" property
         await Identify(clientWebSocket);
     }
@@ -98,17 +107,19 @@ static class DiscordWebSocket
 
     static async Task CloseSockets(ClientWebSocket clientWebSocket)
     {
+        if(clientWebSocket.State != WebSocketState.Open) return;
+
         await clientWebSocket.CloseOutputAsync(WebSocketCloseStatus.Empty, "", CancellationToken.None);
         if(clientWebSocket.CloseStatus != WebSocketCloseStatus.NormalClosure && clientWebSocket.CloseStatus != WebSocketCloseStatus.InternalServerError)
-        {
             await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
-        }
+
+        clientWebSocket.Abort();
     }
 
     public static async Task Start()
     {
-        while(true)
-        {
+        while(true) 
+        { 
             CancellationToken cancellationToken = new();
             ClientWebSocket clientWebSocket = new ClientWebSocket();
             await ConnectDiscordWebSocket(clientWebSocket, cancellationToken);
@@ -118,9 +129,11 @@ static class DiscordWebSocket
             {
                 var result = await GetDiscordEvent(clientWebSocket, cancellationToken);
 
-                if (result == null &&
-                    clientWebSocket.State == WebSocketState.CloseReceived)
+                if (clientWebSocket.State != WebSocketState.Open)
+                {
+                    Thread.Sleep(random.Next(1000, 5000));
                     break;
+                }
 
                 if (result?.op == 9)
                 {
