@@ -31,14 +31,8 @@ namespace GMABot.Slash_Commands.Commands.Latex
                 if(post.isGallery)
                     urls = post.gallery!.items!.Select(item => ($"https://i.redd.it/{item.urlId}.jpg", false)).ToArray();
 
-                Schedule schedule = new Schedule() { title = $"Daily Horoscope -kurov", type = FormatType.MESSAGE };
-                //DiscordHttpClient.SendMessage(DiscordMessageFactory.CreateMessage(schedule, "https://thumbs2.redgifs.com/UnhappyOutlyingOx-mobile.mp4#t=0"), "913996232790274070");
-
                 DiscordHttpClient.ReplyToInteraction(token, id, DiscordMessageFactory.CreateMediaMessage(post.permaLink, urls));
             });
-            
-            // Get image from reddit
-            // Send image to channel
         }
     }
 }
