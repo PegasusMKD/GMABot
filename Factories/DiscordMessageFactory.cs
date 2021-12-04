@@ -1,11 +1,7 @@
 ﻿using GMABot.Models;
 using GMABot.Models.Discord;
 using GMABot.Models.Schedules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using GMABot.Models.Torrents;
 
 namespace GMABot.Factories
 {
@@ -34,6 +30,12 @@ namespace GMABot.Factories
 
             return message;
         }
+
+        public static DiscordMessage CreateTopTorrentsMessage(List<Torrent> torrents) =>
+            new() { embeds = torrents.Select(torrent => CreateEmbedMessage(torrent.name, torrent.GetDescription())).ToList() };
+
+        public static DiscordEmbed CreateEmbedMessage(string title, string description) =>
+            new() { title = title, description = description };
 
         public static DiscordMessage CreateMediaMessage(string alt, (string url, bool isVideo)[] urls)
         {

@@ -13,11 +13,11 @@ namespace GMABot.Slash_Commands.Commands.Horoscope
             };
 
         // Add better formatting (with embed attributes)
-        public void Execute(string token, string id, object[]? parameters)
+        public void Execute(string token, string id, Dictionary<string, object>? parameters)
         {
             Task.Factory.StartNew(() =>
             {
-                string horoscopeType = (parameters![0] as String)!;
+                string horoscopeType = (parameters!["horoscope-type"] as string)!;
                 Schedule schedule = new Schedule() { title = $"Weekly Horoscope - {horoscopeType}", type = FormatType.EMBED };
                 var message = DiscordMessageFactory.CreateMessage(schedule, HTMLParser.GetDailyHoroscopeText($"http://www.astromagazin.com.mk/{horoscopeType}/nedelen.php", "nedelen"));
                 DiscordHttpClient.ReplyToInteraction(token, id, message);
