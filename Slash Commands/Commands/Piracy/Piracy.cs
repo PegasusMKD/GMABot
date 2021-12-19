@@ -28,7 +28,9 @@ namespace GMABot.Slash_Commands.Commands.Piracy
             Task.Factory.StartNew(async () => {
                 var searchText = (parameters!["search-text"] as string)!;
                 string? category = parameters.ContainsKey("category") ? parameters!["category"] as string : null;
-                string algorithm = parameters.ContainsKey("algorithm") ? (parameters!["algorithm"] as string)! : "ratio";
+                PiracyAlgorithm algorithm = parameters.ContainsKey("algorithm") ?
+                    PiracyAlgorithmConverter.GetType((parameters!["algorithm"] as string)!.ToLower()) :
+                    PiracyAlgorithm.FORMULA;
 
                 var torrents = new List<Torrent>();
                 foreach(var client in clients)
@@ -37,16 +39,16 @@ namespace GMABot.Slash_Commands.Commands.Piracy
                 IEnumerable<Torrent> torrentQuery = torrents.AsQueryable();
                 switch(algorithm)
                 {
-                    case "ratio":
+                    case PiracyAlgorithm.RATIO:
                         torrentQuery = torrents.OrderByDescending(torrent => torrent.seeders / (float)(torrent.seeders + torrent.leechers));
                         break;
-                    case "seeders":
+                    case PiracyAlgorithm.SEEDERS:
                         torrentQuery = torrents.OrderByDescending(torrent => torrent.seeders);
                         break;
-                    case "leechers":
+                    case PiracyAlgorithm.LEECHERS:
                         torrentQuery = torrents.OrderByDescending(torrent => torrent.leechers);
                         break;
-                    case "formula":
+                    case PiracyAlgorithm.FORMULA:
                         torrentQuery = torrents.OrderByDescending(torrent => torrent.seeders * 6 - torrent.leechers * 2);
                         break;
                 }

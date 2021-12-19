@@ -19,7 +19,7 @@ namespace GMABot.Models.Torrents
 
     static class PirateBayCategoryConverter
     {
-        static Dictionary<PirateBayCategory, string> embedTypes = new Dictionary<PirateBayCategory, string>
+        static Dictionary<PirateBayCategory, string> categories = new Dictionary<PirateBayCategory, string>
         {
             {PirateBayCategory.AUDIO, "audio" },
             {PirateBayCategory.VIDEO, "video" },
@@ -29,9 +29,9 @@ namespace GMABot.Models.Torrents
             {PirateBayCategory.OTHER, "other" },
         };
 
-        public static string GetText(PirateBayCategory type) => embedTypes[type];
+        public static string GetText(PirateBayCategory type) => categories[type];
 
         public static PirateBayCategory GetType(string type) =>
-            embedTypes.FirstOrDefault(embed => embed.Value == type).Key;
+            categories.FirstOrDefault(category => category.Value == type).Key;
     }
 }
