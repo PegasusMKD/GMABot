@@ -12,7 +12,7 @@ namespace GMABot.Http
 {
     class MessageScheduler
     {
-        readonly HttpClient client = HttpClientFactory.GetHttpClient();
+        readonly HttpClient client = HttpClientFactory.GetDiscordHttpClient();
 
         // Timer constants
         const int checkTime =      1 * 60 * 1000;
@@ -44,28 +44,33 @@ namespace GMABot.Http
 
         public void Start()
         {
+            Console.WriteLine($"[{DateTime.Now}] Scheduled standard messages.");
             ScheduleMessages<MessageSchedule>(messages, (schedule, timer) =>
                 {
                     var message = DiscordMessageFactory.CreateMessage(schedule, schedule.message);
-                    DiscordHttpClient.SendMessage(timer, message, schedule.channel ?? defaultChannel);
+                    DiscordHttpClient.SendTimerMessage(timer, message, schedule.channel ?? defaultChannel);
                 }
             );
 
+            Console.WriteLine($"[{DateTime.Now}] Scheduled HTML messages.");
             ScheduleMessages<HTMLSchedule>(htmlSchedules, (schedule, timer) =>
                 {
-                    var message = DiscordMessageFactory.CreateMessage(schedule, HTMLParser.ParseHtmlText(schedule.url));
-                    DiscordHttpClient.SendMessage(timer, message, schedule.channel ?? defaultChannel);
+                    var message = DiscordMessageFactory.CreateMessage(schedule, HTMLParser.GetDailyHoroscopeText(schedule.url, "text"));
+                    DiscordHttpClient.SendTimerMessage(timer, message, schedule.channel ?? defaultChannel);
                 }
             );
 
             // Queue remaining messages of the day
             TimeOnly currentTime = TimeOnly.FromDateTime(DateTime.Now);
-            scheduleTimers.FindAll(timer => timer.Time.CompareTo(currentTime) > 0).ForEach(timer => timer.Start());
+            
 
+            Console.WriteLine($"[{DateTime.Now}] Started timers.");
+            // scheduleTimers.FindAll(timer => timer.Time.CompareTo(currentTime) > 0)
+            scheduleTimers.ForEach(timer => timer.Start());
+
+
+            Console.WriteLine($"[{DateTime.Now}] Started reset timer.");
             resetTimer.Start();
-
-            // So we stall the main thread while the timers are ticking
-            while (Console.ReadLine() != "q") ;
         }
 
         void ScheduleMessages<T>(T[] messages, Action<T, MessageTimer> action) where T: Schedule

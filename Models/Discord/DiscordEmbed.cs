@@ -7,5 +7,9 @@ namespace GMABot.Models
         public string? title;
         public EmbedType type;
         public string? description;
+
+        public string? url;
+        public DiscordImage? image;
+        public DiscordImage? video;
     }
 }
