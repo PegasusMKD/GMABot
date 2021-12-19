@@ -10,7 +10,8 @@
 
         internal string GetDescription()
         {
-            return $"\t **Uploader: {uploader}**\n\t " +
+            return 
+                $"\t **Uploader: {uploader}**\n\t " +
                 $"URL: {url}\n\t " +
                 $"Seeders: {seeders}\n\t " +
                 $"Leechers: {leechers} \n\t";

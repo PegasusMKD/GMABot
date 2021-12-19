@@ -18,7 +18,9 @@ namespace GMABot.Slash_Commands.Commands.Piracy
             };
 
         private readonly IPiracyClient[] clients = new IPiracyClient[] { 
-            new Piracy1337xClient()
+            new Piracy1337xClient(),
+            new KATClient(),
+            new PirateBayClient()
         };
 
         public void Execute(string token, string id, Dictionary<string, object>? parameters)
