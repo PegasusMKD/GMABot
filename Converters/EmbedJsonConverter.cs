@@ -9,7 +9,7 @@ namespace GMABot.Converters
             writer.WriteValue(EmbedConverter.GetText(value));
 
         public override EmbedType ReadJson(JsonReader reader, Type objectType, EmbedType existingValue, bool hasExistingValue, JsonSerializer serializer) =>
-            EmbedConverter.GetType(reader.Value as string);
+            EmbedConverter.GetType((reader.Value as string)!);
 
     }
 }

@@ -10,8 +10,6 @@ namespace GMABot.Http
 {
     class MessageScheduler
     {
-        readonly HttpClient client = HttpClientFactory.GetDiscordHttpClient();
-
         // Timer constants
         const int checkTime =      1 * 60 * 1000;
         const int resetTime = 24 * 60 * 60 * 1000;
