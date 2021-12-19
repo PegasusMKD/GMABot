@@ -40,9 +40,11 @@ namespace GMABot.HTTP
         {
             var request = new HttpRequestMessage(HttpMethod.Post,
                 HttpClientFactory.baseUri + $"/applications/{applicationId}/commands");
-            request.Content = new StringContent(JsonConvert.SerializeObject(subcommand, serializerSettings), Encoding.Unicode, "application/json");
-            
-            client.SendAsync(request);
+            var json = JsonConvert.SerializeObject(subcommand, serializerSettings);
+            request.Content = new StringContent(json, Encoding.Unicode, "application/json");
+            var result = client.SendAsync(request).Result;
+            if (!result.IsSuccessStatusCode)
+                Console.Error.WriteLine("Something went terribly wrong...");
         }
 
         public static void SendTimerMessage(MessageTimer? timer, DiscordMessage message, string channel)

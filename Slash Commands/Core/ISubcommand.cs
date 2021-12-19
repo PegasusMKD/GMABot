@@ -10,6 +10,6 @@ namespace GMABot.Slash_Commands.Core
     {
         DiscordCommandParameter[]? parameters { get; }
 
-        void Execute(string token, string id, object[]? parameters);
+        void Execute(string token, string id, Dictionary<string,object>? parameters);
     }
 }

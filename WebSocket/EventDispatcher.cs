@@ -17,9 +17,13 @@ namespace GMABot.WebSocket
             switch(eventBase.t)
             {
                 case DiscordEventType.INTERACTION_CREATE:
+                    var parameters = new Dictionary<string, object>();
                     var discordEvent = GetCommand<InteractionEvent>(eventBase, (discordEvent) => discordEvent.data);
-                    commands[discordEvent.command.name].Execute(discordEvent.meta.token, discordEvent.meta.id,
-                        discordEvent.command.options?.Select(option => option.value).ToArray());
+                    if(discordEvent.command.options != null)
+                        foreach(var parameter in discordEvent.command.options)
+                            parameters.Add(parameter.name, parameter.value);
+
+                    commands[discordEvent.command.name].Execute(discordEvent.meta.token, discordEvent.meta.id, parameters);
                     break;
 
                 // Disconnected, should close all sockets, reconnect and resume

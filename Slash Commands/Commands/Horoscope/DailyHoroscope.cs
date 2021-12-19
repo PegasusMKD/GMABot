@@ -12,11 +12,11 @@ namespace GMABot.Slash_Commands.Commands.Horoscope
                 new DiscordCommandParameter { name = "horoscope-type", description = "Which horoscope are you interested (\"skorpija\" for example).", required = true }
             };
 
-        public void Execute(string token, string id, object[]? parameters)
+        public void Execute(string token, string id, Dictionary<string, object>? parameters)
         {
             Task.Factory.StartNew(() =>
             {
-                string horoscopeType = (parameters![0] as String)!;
+                string horoscopeType = (parameters!["horoscope-type"] as string)!;
                 Schedule schedule = new() { title = $"Daily Horoscope - {horoscopeType}", type = FormatType.EMBED };
                 var message = DiscordMessageFactory.CreateMessage(schedule, HTMLParser.GetDailyHoroscopeText($"http://www.astromagazin.com.mk/{horoscopeType}/dneven.php", "text"));
                 DiscordHttpClient.ReplyToInteraction(token, id, message);
