@@ -4,11 +4,7 @@ using GMABot.Models.WebSocket.Event_Responses;
 using GMABot.Slash_Commands;
 using GMABot.Timers;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GMABot.HTTP
 {

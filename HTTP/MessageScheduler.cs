@@ -3,8 +3,6 @@ using GMABot.HTTP;
 using GMABot.Models;
 using GMABot.Models.Schedules;
 using GMABot.Timers;
-using Newtonsoft.Json;
-using System.Text;
 using System.Timers;
 
 
