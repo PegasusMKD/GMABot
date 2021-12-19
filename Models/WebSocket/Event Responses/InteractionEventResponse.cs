@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GMABot.Models.WebSocket.Event_Responses
+﻿namespace GMABot.Models.WebSocket.Event_Responses
 {
     internal class InteractionEventResponse
     {

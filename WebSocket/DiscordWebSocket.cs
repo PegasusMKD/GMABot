@@ -18,15 +18,15 @@ static class DiscordWebSocket
     };
 
     private static readonly Random random = new();
-    private static System.Timers.Timer heartbeatTimer;
+    private static System.Timers.Timer? heartbeatTimer;
 
     // TODO: Clean up into a ".settings" file
     static readonly string token = "OTEzOTMzNTg5MzkyMDIzNTg0.YaFs-w.87wQwPP2ISCHroQqU-93kXvFCBI";
     // https://ziad87.net/intents/
     static readonly int intent = 513;
 
-    public static string sessionId;
-    static int latestSequenceNumber;
+    public static string? sessionId;
+    static int? latestSequenceNumber;
 
     static async Task<DiscordEventBase?> GetDiscordEvent(ClientWebSocket clientWebSocket, CancellationToken cancellationToken)
     {
@@ -147,12 +147,5 @@ static class DiscordWebSocket
 
             await CloseSockets(clientWebSocket);
         }
-    }
-
-    private static async Task Resume(ClientWebSocket clientWebSocket)
-    {
-        var resumeEvent = new ResumeEvent { seq = latestSequenceNumber, session_id = sessionId, token = token };
-        var payload = new DiscordEventWrapper<ResumeEvent>(6, resumeEvent);
-        await SendDiscordEvent(clientWebSocket, payload);
     }
 }
